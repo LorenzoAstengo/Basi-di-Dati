@@ -1,0 +1,75 @@
+﻿--Lab 4 gruppo 7
+
+set search_path to "unicorsi";
+
+--Funzioni di gruppo
+
+--1)
+
+SELECT MAX(stipendio) as massimo , MIN(stipendio) AS minimo , AVG(stipendio) as medio
+FROM professori;
+
+--2)
+
+SELECT MIN(voto) as minimo, AVG(voto) as medio, MAX(voto) as massimo
+FROM esami join corsi ON Esami.corso=Corsi.id
+where Corsodilaurea=9;
+
+
+--3)
+
+SELECT facolta, corsidilaurea.denominazione, MAX(voto)
+FROM esami JOIN corsi ON corso=corsi.id JOIN corsidilaurea ON corsodilaurea=corsidilaurea.id
+GROUP BY corsidilaurea.denominazione, facolta;
+
+--4)
+
+SELECT cognome, nome, COUNT(*)
+FROM professori JOIN corsi ON professori.id=professore
+WHERE attivato='true'
+GROUP BY professore, cognome, nome
+HAVING COUNT(*)>2
+ORDER BY cognome, nome;
+
+--5)
+
+SELECT corsi.denominazione
+FROM esami RIGHT JOIN corsi ON corso=corsi.id  AND esami.data > DATE '2012-04-12' JOIN corsidilaurea ON corsodilaurea=corsidilaurea.id
+WHERE corsidilaurea.denominazione='Informatica'
+GROUP BY corsi.denominazione
+HAVING COUNT(*) < 5;
+
+--6)
+select professori.Cognome, professori.nome,count(*)
+from professori join studenti on studenti.relatore=professori.id
+group by  professori.id
+order by professori.cognome ;
+
+--7)
+select professori.Cognome, professori.nome,count(studenti.relatore)
+from professori left outer join studenti on studenti.relatore=professori.id
+group by  professori.id
+order by professori.cognome ;
+
+
+--------------Sotto-Interrogazioni
+
+--1)
+
+SELECT denominazione
+FROM corsidilaurea JOIN studenti ON studenti.corsodilaurea = corsidilaurea.id
+WHERE denominazione <> 'Informatica' AND iscrizione = 2010
+GROUP BY denominazione
+HAVING COUNT(*) < (SELECT count(*)
+				FROM corsidilaurea JOIN studenti ON studenti.corsodilaurea = corsidilaurea.id
+				WHERE denominazione = 'Informatica' AND iscrizione = 2010
+				GROUP BY denominazione);
+
+--2)
+
+SELECT studente AS matricola
+FROM esami JOIN corsi ON corso=corsi.id JOIN corsidilaurea ON corsodilaurea=corsidilaurea.id
+WHERE corsidilaurea.denominazione='Informatica' AND voto = (SELECT max(voto) FROM esami);
+
+
+
